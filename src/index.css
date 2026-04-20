@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  background-color: #020617;
+  color: white;
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Forzar que Tailwind cargue las clases incluso si hay latencia */
+@layer base {
+  body {
+    background-color: #020617;
+    color: white;
+  }
+}
+
+/* Optimización Cross-Browser para Glassmorphism */
+.glass-effect {
+  background: rgba(15, 23, 42, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Scrollbars Estilo Techno */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 211, 238, 0.3);
+}
+
+/* Ajustes de Input para iOS */
+input, select, textarea {
+  font-size: 16px !important;
+  background-color: transparent;
+}
+
+/* Eliminar resaltado de toque en móviles */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
