@@ -150,7 +150,7 @@ export const Login = () => {
             Nodos Activos
           </span>
           <span className="text-slate-800">|</span>
-          <span>Encripción Quantum-Ready</span>
+          <span className="text-cyan-500/50">Desarrollado by: Paul Medina</span>
         </div>
       </motion.div>
     </div>
