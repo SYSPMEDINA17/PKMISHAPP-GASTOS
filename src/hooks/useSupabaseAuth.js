@@ -79,8 +79,7 @@ export const useSupabaseAuth = () => {
     }
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      // Esta URL debe estar registrada en tu Dashboard de Supabase -> Authentication -> URL Configuration
-      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+      redirectTo: `${window.location.origin}`,
     });
     
     if (error) throw error;
