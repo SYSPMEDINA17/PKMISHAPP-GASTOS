@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 export const useSupabaseAuth = () => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [recoveryMode, setRecoveryMode] = useState(false);
 
   useEffect(() => {
     if (!supabase) {
@@ -26,12 +27,15 @@ export const useSupabaseAuth = () => {
 
     checkSession();
 
-    // 2. Escuchar cambios en la autenticación (incluyendo la confirmación del correo)
+    // 2. Escuchar cambios en la autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, newSession) => {
       console.log("Evento de Autenticación detectado:", event);
       setSession(newSession);
+
+      if (event === 'PASSWORD_RECOVERY') {
+        setRecoveryMode(true);
+      }
       
-      // Si el evento es SIGN_IN o INITIAL_SESSION, aseguramos que loading sea false
       if (newSession) setLoading(false);
     });
 
@@ -66,12 +70,38 @@ export const useSupabaseAuth = () => {
     if (error) throw error;
   };
 
+  const resetPassword = async (email) => {
+    if (!supabase) throw new Error("Supabase no está configurado");
+    
+    // Validar email antes de enviar
+    if (!email || !email.includes('@')) {
+      throw new Error("Por favor, ingresa un correo electrónico válido.");
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      // Esta URL debe estar registrada en tu Dashboard de Supabase -> Authentication -> URL Configuration
+      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+    });
+    
+    if (error) throw error;
+  };
+
+  const updatePassword = async (newPassword) => {
+    if (!supabase) throw new Error("Supabase no está configurado");
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+  };
+
   return {
     session,
     user: session?.user ?? null,
     loading,
+    recoveryMode,
+    setRecoveryMode,
     signUp,
     signIn,
-    signOut
+    signOut,
+    resetPassword,
+    updatePassword
   };
 };

@@ -6,14 +6,19 @@ import { Navbar } from './components/Navbar';
 import { Dashboard } from './pages/Dashboard';
 import { ProfileSettings } from './components/ProfileSettings';
 import { Login } from './components/Login';
+import { ResetPassword } from './components/ResetPassword';
 import { cn } from './lib/utils';
 import { AnimatePresence } from 'framer-motion';
 import { Toaster } from 'sonner';
 
 const AppContent = () => {
-  const { user, loading } = useExpenses();
+  const { user, loading, recoveryMode, setRecoveryMode } = useExpenses();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' o 'profile'
+
+  if (recoveryMode) {
+    return <ResetPassword onComplete={() => setRecoveryMode(false)} />;
+  }
 
   if (loading && !user) {
     return (

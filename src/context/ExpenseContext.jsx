@@ -8,7 +8,13 @@ import { formatCurrency } from '../lib/utils';
 const ExpenseContext = createContext();
 
 export const ExpenseProvider = ({ children }) => {
-  const { user, signOut: supabaseSignOut, loading: authLoading } = useSupabaseAuth();
+  const { 
+    user, 
+    signOut: supabaseSignOut, 
+    loading: authLoading, 
+    recoveryMode, 
+    setRecoveryMode 
+  } = useSupabaseAuth();
   const { householdId, loading: householdLoading } = useHousehold(user);
   
   const [expenses, setExpenses] = useState([]);
@@ -304,6 +310,8 @@ export const ExpenseProvider = ({ children }) => {
       totalExpenses,
       theme,
       toggleTheme,
+      recoveryMode,
+      setRecoveryMode,
       signOut: supabaseSignOut
     }}>
       {children}
