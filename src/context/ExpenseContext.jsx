@@ -22,7 +22,7 @@ export const ExpenseProvider = ({ children }) => {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [budgets, setBudgets] = useState({});
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+  const [theme] = useState('dark');
   const [filters, setFilters] = useState({
     month: new Date().toISOString().slice(0, 7),
     category: 'all'
@@ -31,13 +31,8 @@ export const ExpenseProvider = ({ children }) => {
   const isGlobalLoading = authLoading || (user && householdLoading);
 
   useEffect(() => {
-    localStorage.setItem('theme', theme);
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
+    document.documentElement.classList.add('dark');
+  }, []);
 
   useEffect(() => {
     if (user && householdId) {
@@ -324,8 +319,6 @@ export const ExpenseProvider = ({ children }) => {
       totalBalance,
       totalIncome,
       totalExpenses,
-      theme,
-      toggleTheme,
       recoveryMode,
       setRecoveryMode,
       signOut: supabaseSignOut

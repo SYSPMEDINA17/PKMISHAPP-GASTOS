@@ -82,14 +82,14 @@ export const Sidebar = ({ collapsed, setCollapsed }) => {
 
       <aside
         className={cn(
-          "fixed left-0 top-0 h-full bg-[#020617]/90 backdrop-blur-3xl border-r border-white/5 transition-all duration-500 z-50 flex flex-col",
-          collapsed ? "-translate-x-full md:translate-x-0 md:w-20" : "translate-x-0 w-72 shadow-2xl shadow-black/50"
+          "fixed left-0 top-0 h-full bg-[var(--background)] backdrop-blur-3xl border-r border-white/5 dark:border-white/5 border-slate-200 transition-all duration-500 z-50 flex flex-col",
+          collapsed ? "-translate-x-full md:translate-x-0 md:w-20" : "translate-x-0 w-72 shadow-2xl shadow-black/5 dark:shadow-black/50"
         )}
       >
         {/* Botón de Colapso - Solo Desktop/Tablet */}
         <button 
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-20 w-6 h-6 bg-slate-900 border border-white/10 rounded-full hidden md:flex items-center justify-center text-slate-500 hover:text-white hover:border-cyan-500/50 transition-all z-40 group"
+          className="absolute -right-3 top-20 w-6 h-6 bg-[var(--background)] border border-slate-200 dark:border-white/10 rounded-full hidden md:flex items-center justify-center text-slate-500 hover:text-cyan-500 transition-all z-40 group"
         >
           {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
         </button>
@@ -101,15 +101,15 @@ export const Sidebar = ({ collapsed, setCollapsed }) => {
             collapsed ? "justify-center" : "gap-4"
           )}>
             <div className="relative flex items-end gap-[2px] h-8 shrink-0">
-              <div className="w-[3px] bg-slate-700 h-3" />
-              <div className="w-[3px] bg-slate-500 h-5" />
-              <div className="w-[3px] bg-white h-7 shadow-[0_0_10px_white]" />
-              <TrendingUp className="absolute -top-1 -right-1.5 w-4 h-4 text-cyan-400" />
+              <div className="w-[3px] bg-slate-300 dark:bg-slate-700 h-3" />
+              <div className="w-[3px] bg-slate-400 dark:bg-slate-500 h-5" />
+              <div className="w-[3px] bg-slate-900 dark:bg-white h-7 shadow-[0_0_10px_rgba(0,0,0,0.1)] dark:shadow-[0_0_10px_white]" />
+              <TrendingUp className="absolute -top-1 -right-1.5 w-4 h-4 text-cyan-500" />
             </div>
 
             {!collapsed && (
               <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
-                <h1 className="text-xl font-black tracking-tighter leading-none text-white">PKMISHAPP</h1>
+                <h1 className="text-xl font-black tracking-tighter leading-none text-[var(--foreground)]">PKMISHAPP</h1>
                 <div className="flex items-center gap-1.5 mt-1">
                   <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
                   <span className="text-[8px] uppercase tracking-[0.3em] text-cyan-500 font-extrabold">Fin-Intelligence</span>

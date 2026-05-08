@@ -10,7 +10,7 @@ export const Layout = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex bg-[#020617] transition-colors duration-300 overflow-hidden text-white font-sans">
+    <div className="min-h-screen flex transition-colors duration-500 overflow-hidden font-sans bg-[var(--background)] text-[var(--foreground)]">
       <Sidebar 
         collapsed={sidebarCollapsed} 
         setCollapsed={setSidebarCollapsed}
@@ -43,10 +43,6 @@ export const Layout = () => {
           </AnimatePresence>
         </main>
       </div>
-
-      {/* Orbe de luz de fondo global */}
-      <div className="fixed top-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none -z-10" />
-      <div className="fixed bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-600/5 rounded-full blur-[120px] pointer-events-none -z-10" />
     </div>
   );
 };

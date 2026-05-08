@@ -2,16 +2,7 @@ import React, { useState } from 'react';
 import { Target, Edit2, Check, X } from 'lucide-react';
 import { useExpenses } from '../context/ExpenseContext';
 import { formatCurrency, cn } from '../lib/utils';
-
-const CATEGORIES = [
-  { id: 'food', label: 'Comida y Restaurantes', icon: '🍔' },
-  { id: 'transport', label: 'Transporte', icon: '🚗' },
-  { id: 'home', label: 'Hogar y Servicios', icon: '🏠' },
-  { id: 'entertainment', label: 'Entretenimiento', icon: '🎮' },
-  { id: 'shopping', label: 'Compras', icon: '🛍️' },
-  { id: 'health', label: 'Salud', icon: '🏥' },
-  { id: 'other', label: 'Otros', icon: '📦' },
-];
+import { CATEGORIES } from '../lib/constants.jsx';
 
 const BudgetCard = ({ category, spent, budget, onEdit }) => {
   const percent = budget > 0 ? (spent / budget) * 100 : 0;
@@ -19,30 +10,30 @@ const BudgetCard = ({ category, spent, budget, onEdit }) => {
   const getProgressColor = () => {
     if (percent >= 100) return 'bg-rose-500';
     if (percent >= 80) return 'bg-amber-500';
-    return 'bg-primary-500';
+    return 'bg-cyan-500';
   };
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all group">
+    <div className="bg-white/[0.02] border border-white/5 p-4 rounded-2xl hover:border-cyan-500/20 transition-all group">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
-          <span className="text-xl">{category.icon}</span>
+          <span className="text-xl">{category.emoji}</span>
           <div>
-            <h4 className="text-sm font-bold dark:text-white">{category.label}</h4>
-            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">
-              {formatCurrency(spent)} de {formatCurrency(budget)}
+            <h4 className="text-sm font-bold text-white uppercase tracking-tight">{category.label}</h4>
+            <p className="text-[10px] text-slate-500 uppercase font-black tracking-wider">
+              {formatCurrency(spent)} / {formatCurrency(budget)}
             </p>
           </div>
         </div>
         <button 
           onClick={() => onEdit(category)}
-          className="p-2 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-primary-500 transition-all"
+          className="p-2 opacity-0 group-hover:opacity-100 text-slate-500 hover:text-cyan-400 transition-all"
         >
           <Edit2 className="w-3.5 h-3.5" />
         </button>
       </div>
 
-      <div className="relative h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+      <div className="relative h-1.5 bg-slate-800 rounded-full overflow-hidden">
         <div 
           className={cn("absolute left-0 top-0 h-full transition-all duration-500", getProgressColor())}
           style={{ width: `${Math.min(percent, 100)}%` }}
@@ -51,14 +42,14 @@ const BudgetCard = ({ category, spent, budget, onEdit }) => {
       
       <div className="flex justify-between mt-2">
         <span className={cn(
-          "text-[10px] font-bold",
-          percent >= 100 ? "text-rose-500" : percent >= 80 ? "text-amber-500" : "text-slate-400"
+          "text-[8px] font-black uppercase tracking-widest",
+          percent >= 100 ? "text-rose-500" : percent >= 80 ? "text-amber-500" : "text-slate-500"
         )}>
-          {percent.toFixed(0)}% utilizado
+          {percent.toFixed(0)}% Capacidad
         </span>
         {budget > 0 && spent > budget && (
-          <span className="text-[10px] font-bold text-rose-500 animate-pulse">
-            ¡Excedido!
+          <span className="text-[8px] font-black text-rose-500 animate-pulse uppercase tracking-widest">
+            Fuga Detectada
           </span>
         )}
       </div>
@@ -82,44 +73,47 @@ export const BudgetManager = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm h-full">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-slate-950/40 backdrop-blur-xl p-6 rounded-[32px] border border-white/5 shadow-2xl h-full flex flex-col">
+      <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary-50 dark:bg-primary-500/10 rounded-xl text-primary-500">
+          <div className="p-2.5 bg-cyan-500/10 border border-cyan-500/20 rounded-xl text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
             <Target className="w-5 h-5" />
           </div>
-          <h3 className="text-lg font-bold dark:text-white">Presupuestos Mensuales</h3>
+          <div>
+            <h3 className="text-sm font-black text-white uppercase tracking-widest">Presupuestos de Nodo</h3>
+            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Control de límites operativos</p>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+      <div className="space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar">
         {CATEGORIES.map(cat => {
           const budget = budgets[`${filters.month}-${cat.id}`] || 0;
           const spent = expensesByCategory[cat.id] || 0;
 
           if (editingCategory === cat.id) {
             return (
-              <div key={cat.id} className="bg-primary-50/50 dark:bg-primary-500/5 p-4 rounded-2xl border-2 border-primary-500/20">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="text-xl">{cat.icon}</span>
-                  <span className="text-sm font-bold dark:text-white">{cat.label}</span>
+              <div key={cat.id} className="bg-cyan-500/5 p-4 rounded-2xl border border-cyan-500/30 shadow-[0_0_20px_rgba(6,182,212,0.05)]">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-xl">{cat.emoji}</span>
+                  <span className="text-xs font-black text-white uppercase tracking-widest">{cat.label}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">S/</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-500/50 text-xs font-bold">$</span>
                     <input
                       autoFocus
                       type="number"
                       value={tempAmount}
                       onChange={(e) => setTempAmount(e.target.value)}
                       placeholder="0.00"
-                      className="w-full pl-8 pr-4 py-2 bg-white dark:bg-slate-800 border-none rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-500 dark:text-white"
+                      className="w-full pl-7 pr-4 py-2.5 bg-[#020617] border border-white/10 rounded-xl text-sm outline-none focus:border-cyan-500/50 text-white font-mono"
                     />
                   </div>
-                  <button onClick={handleSave} className="p-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors">
-                    <Check className="w-4 h-4" />
+                  <button onClick={handleSave} className="p-2.5 bg-cyan-500 text-black rounded-xl hover:bg-cyan-400 transition-all shadow-lg">
+                    <Check className="w-4 h-4 font-black" />
                   </button>
-                  <button onClick={() => setEditingCategory(null)} className="p-2 bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-xl hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
+                  <button onClick={() => setEditingCategory(null)} className="p-2.5 bg-white/[0.05] text-slate-400 rounded-xl hover:text-white transition-all border border-white/5">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
@@ -137,13 +131,6 @@ export const BudgetManager = () => {
             />
           );
         })}
-
-        {Object.values(budgets).every(v => v === 0) && (
-          <div className="text-center py-8 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-2xl">
-            <p className="text-sm text-slate-500 dark:text-slate-400">No hay presupuestos definidos.</p>
-            <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold">Haz clic en editar para empezar</p>
-          </div>
-        )}
       </div>
     </div>
   );

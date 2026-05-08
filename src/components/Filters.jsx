@@ -1,19 +1,8 @@
 import React from 'react';
-import { Calendar, Filter, MousePointer2, Tag } from 'lucide-react';
+import { Calendar, Filter } from 'lucide-react';
 import { useExpenses } from '../context/ExpenseContext';
 import { motion } from 'framer-motion';
-
-const CATEGORIES = [
-  { id: 'all', label: 'Todos los Nodos', icon: '🌐' },
-  { id: 'food', label: 'Nutrición y Diarios', icon: '🍲' },
-  { id: 'transport', label: 'Movilidad y Logística', icon: '⚡' },
-  { id: 'home', label: 'Residencial y Servicios', icon: '🏢' },
-  { id: 'entertainment', label: 'Ocio y Digital', icon: '🎮' },
-  { id: 'shopping', label: 'Adquisiciones', icon: '💎' },
-  { id: 'health', label: 'Bio-Mantenimiento', icon: '💉' },
-  { id: 'salary', label: 'Ingresos y Activos', icon: '💳' },
-  { id: 'other', label: 'Otros y Varios', icon: '📦' },
-];
+import { CATEGORIES } from '../lib/constants.jsx';
 
 export const Filters = () => {
   const { filters, setFilters } = useExpenses();
@@ -63,9 +52,10 @@ export const Filters = () => {
               onChange={(e) => handleFilterChange('category', e.target.value)}
               className="bg-transparent border-none p-0 text-base font-bold tracking-tight focus:ring-0 text-white cursor-pointer appearance-none pr-8"
             >
+              <option value="all" className="bg-slate-900 text-white font-medium">🌐 Todos los Nodos</option>
               {CATEGORIES.map(cat => (
                 <option key={cat.id} value={cat.id} className="bg-slate-900 text-white font-medium">
-                   {cat.icon} {cat.label}
+                   {cat.emoji} {cat.label}
                 </option>
               ))}
             </select>

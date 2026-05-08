@@ -3,23 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, DollarSign, Calendar, Tag, FileText, Zap } from 'lucide-react';
 import { useExpenses } from '../context/ExpenseContext';
 import { cn } from '../lib/utils';
-
-const CATEGORIES = [
-  { id: 'food', label: 'Comida y Restaurantes', icon: '🍔' },
-  { id: 'transport', label: 'Transporte', icon: '🚗' },
-  { id: 'home', label: 'Hogar y Servicios', icon: '🏠' },
-  { id: 'entertainment', label: 'Entretenimiento', icon: '🎮' },
-  { id: 'shopping', label: 'Compras', icon: '🛍️' },
-  { id: 'health', label: 'Salud', icon: '🏥' },
-  { id: 'salary', label: 'Salario', icon: '💰' },
-  { id: 'other', label: 'Otros', icon: '📦' },
-];
+import { CATEGORIES } from '../lib/constants.jsx';
 
 export const AddExpenseModal = ({ isOpen, onClose, editData = null }) => {
   const { addExpense, updateExpense } = useExpenses();
   const [type, setType] = useState('expense');
   const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState('food');
+  const [category, setCategory] = useState(CATEGORIES[0].id);
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
@@ -33,7 +23,7 @@ export const AddExpenseModal = ({ isOpen, onClose, editData = null }) => {
     } else {
       setType('expense');
       setAmount('');
-      setCategory('food');
+      setCategory(CATEGORIES[0].id);
       setDescription('');
       setDate(new Date().toISOString().split('T')[0]);
     }
@@ -151,7 +141,7 @@ export const AddExpenseModal = ({ isOpen, onClose, editData = null }) => {
                       className="w-full pl-12 pr-4 py-4 bg-white/[0.03] border border-white/5 focus:border-cyan-500/30 rounded-2xl outline-none transition-all text-white text-[11px] font-bold uppercase tracking-widest appearance-none"
                     >
                       {CATEGORIES.map(cat => (
-                        <option key={cat.id} value={cat.id} className="bg-[#020617] text-white">{cat.icon} {cat.label}</option>
+                        <option key={cat.id} value={cat.id} className="bg-[#020617] text-white">{cat.emoji} {cat.label}</option>
                       ))}
                     </select>
                   </div>
