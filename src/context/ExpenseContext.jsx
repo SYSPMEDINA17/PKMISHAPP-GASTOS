@@ -190,6 +190,21 @@ export const ExpenseProvider = ({ children }) => {
     }
   };
 
+  const updateExpense = async (id, updates) => {
+    try {
+      const { data, error } = await supabase
+        .from('transactions')
+        .update(updates)
+        .eq('id', id)
+        .select();
+      if (error) throw error;
+      setExpenses(prev => prev.map(exp => exp.id === id ? data[0] : exp));
+      toast.success('Transacción actualizada');
+    } catch (error) {
+      toast.error('Error al actualizar: ' + error.message);
+    }
+  };
+
   const deleteExpense = async (id) => {
     try {
       const { error } = await supabase.from('transactions').delete().eq('id', id);
@@ -300,6 +315,7 @@ export const ExpenseProvider = ({ children }) => {
       updateBudget,
       expensesByCategory,
       addExpense,
+      updateExpense,
       deleteExpense,
       addGoal,
       updateGoal,

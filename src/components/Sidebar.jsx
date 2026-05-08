@@ -1,5 +1,6 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { NavLink, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   ArrowUpCircle, 
@@ -9,57 +10,66 @@ import {
   ChevronLeft,
   ChevronRight,
   PieChart,
-  Zap,
   ShieldCheck,
   TrendingUp,
   User
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
-const SidebarItem = ({ icon: Icon, label, active, onClick, collapsed }) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      "relative flex items-center w-full p-3.5 my-1.5 rounded-2xl transition-all duration-300 group overflow-hidden",
-      active 
-        ? "text-white bg-white/5 shadow-[0_0_20px_rgba(34,211,238,0.1)]" 
-        : "text-slate-500 hover:text-slate-300 hover:bg-white/[0.03]"
-    )}
-  >
-    {active && (
-      <motion.div 
-        layoutId="activeGlow"
-        className="absolute left-0 top-1/4 bottom-1/4 w-[3px] bg-gradient-to-b from-cyan-400 to-indigo-500 rounded-r-full shadow-[0_0_10px_rgba(34,211,238,0.5)]"
-      />
-    )}
+const SidebarItem = ({ icon: Icon, label, to, collapsed, onClick }) => {
+  const location = useLocation();
+  const active = location.pathname === to;
 
-    <div className={cn(
-      "flex items-center justify-center transition-transform group-active:scale-90",
-      collapsed ? "w-full" : "w-8"
-    )}>
-      <Icon className={cn(
-        "w-5 h-5 transition-colors duration-300",
-        active ? "text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]" : "group-hover:text-slate-200"
-      )} />
-    </div>
+  return (
+    <NavLink
+      to={to}
+      onClick={onClick}
+      className={cn(
+        "relative flex items-center w-full p-3.5 my-1.5 rounded-2xl transition-all duration-300 group overflow-hidden",
+        active 
+          ? "text-white bg-white/5 shadow-[0_0_20px_rgba(34,211,238,0.1)]" 
+          : "text-slate-500 hover:text-slate-300 hover:bg-white/[0.03]"
+      )}
+    >
+      {active && (
+        <motion.div 
+          layoutId="activeGlow"
+          className="absolute left-0 top-1/4 bottom-1/4 w-[3px] bg-gradient-to-b from-cyan-400 to-indigo-500 rounded-r-full shadow-[0_0_10px_rgba(34,211,238,0.5)]"
+        />
+      )}
 
-    {!collapsed && (
-      <motion.span 
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 1, x: 0 }}
-        className={cn(
-          "ml-3 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors",
-          active ? "text-white" : "text-slate-500 group-hover:text-slate-200"
-        )}
-      >
-        {label}
-      </motion.span>
-    )}
-    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-  </button>
-);
+      <div className={cn(
+        "flex items-center justify-center transition-transform group-active:scale-90",
+        collapsed ? "w-full" : "w-8"
+      )}>
+        <Icon className={cn(
+          "w-5 h-5 transition-colors duration-300",
+          active ? "text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]" : "group-hover:text-slate-200"
+        )} />
+      </div>
 
-export const Sidebar = ({ collapsed, setCollapsed, currentView, setCurrentView }) => {
+      {!collapsed && (
+        <motion.span 
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          className={cn(
+            "ml-3 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors",
+            active ? "text-white" : "text-slate-500 group-hover:text-slate-200"
+          )}
+        >
+          {label}
+        </motion.span>
+      )}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+    </NavLink>
+  );
+};
+
+export const Sidebar = ({ collapsed, setCollapsed }) => {
+  const closeMobileSidebar = () => {
+    if (window.innerWidth < 768) setCollapsed(true);
+  };
+
   return (
     <>
       {/* Overlay para móviles */}
@@ -113,21 +123,38 @@ export const Sidebar = ({ collapsed, setCollapsed, currentView, setCurrentView }
             <SidebarItem 
               icon={LayoutDashboard} 
               label="Dashboard" 
-              active={currentView === 'dashboard'} 
-              onClick={() => { setCurrentView('dashboard'); if (window.innerWidth < 768) setCollapsed(true); }}
-              collapsed={collapsed} 
+              to="/dashboard"
+              collapsed={collapsed}
+              onClick={closeMobileSidebar}
             />
             <SidebarItem 
-              icon={User} 
-              label="Mí Perfil" 
-              active={currentView === 'profile'} 
-              onClick={() => { setCurrentView('profile'); if (window.innerWidth < 768) setCollapsed(true); }}
+              icon={ArrowUpCircle} 
+              label="Entradas" 
+              to="/entradas"
               collapsed={collapsed} 
+              onClick={closeMobileSidebar}
             />
-            <SidebarItem icon={ArrowUpCircle} label="Entradas" collapsed={collapsed} />
-            <SidebarItem icon={ArrowDownCircle} label="Salidas" collapsed={collapsed} />
-            <SidebarItem icon={PieChart} label="Analytics" collapsed={collapsed} />
-            <SidebarItem icon={History} label="Registros" collapsed={collapsed} />
+            <SidebarItem 
+              icon={ArrowDownCircle} 
+              label="Salidas" 
+              to="/salidas"
+              collapsed={collapsed} 
+              onClick={closeMobileSidebar}
+            />
+            <SidebarItem 
+              icon={PieChart} 
+              label="Analytics" 
+              to="/analytics"
+              collapsed={collapsed} 
+              onClick={closeMobileSidebar}
+            />
+            <SidebarItem 
+              icon={History} 
+              label="Registros" 
+              to="/registros"
+              collapsed={collapsed} 
+              onClick={closeMobileSidebar}
+            />
           </nav>
 
           {/* Sección de Seguridad / Footer */}
@@ -150,7 +177,13 @@ export const Sidebar = ({ collapsed, setCollapsed, currentView, setCurrentView }
                 </div>
               </div>
             )}
-            <SidebarItem icon={Settings} label="Ajustes" collapsed={collapsed} />
+            <SidebarItem 
+              icon={Settings} 
+              label="Ajustes" 
+              to="/ajustes"
+              collapsed={collapsed} 
+              onClick={closeMobileSidebar}
+            />
           </div>
         </div>
       </aside>

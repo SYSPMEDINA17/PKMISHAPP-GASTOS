@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Minus, DollarSign, Calendar, Tag, FileText } from 'lucide-react';
+import { X, Plus, Minus, DollarSign, Calendar, Tag, FileText, Zap } from 'lucide-react';
 import { useExpenses } from '../context/ExpenseContext';
 import { cn } from '../lib/utils';
 
@@ -15,29 +15,48 @@ const CATEGORIES = [
   { id: 'other', label: 'Otros', icon: '📦' },
 ];
 
-export const AddExpenseModal = ({ isOpen, onClose }) => {
-  const { addExpense } = useExpenses();
+export const AddExpenseModal = ({ isOpen, onClose, editData = null }) => {
+  const { addExpense, updateExpense } = useExpenses();
   const [type, setType] = useState('expense');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('food');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
+  useEffect(() => {
+    if (editData) {
+      setType(editData.type);
+      setAmount(editData.amount.toString());
+      setCategory(editData.category);
+      setDescription(editData.description);
+      setDate(editData.date);
+    } else {
+      setType('expense');
+      setAmount('');
+      setCategory('food');
+      setDescription('');
+      setDate(new Date().toISOString().split('T')[0]);
+    }
+  }, [editData, isOpen]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!amount || isNaN(amount)) return;
 
-    addExpense({
+    const transactionData = {
       type,
       amount: parseFloat(amount),
       category,
       description: description || CATEGORIES.find(c => c.id === category).label,
       date,
-    });
+    };
 
-    // Reset and close
-    setAmount('');
-    setDescription('');
+    if (editData) {
+      updateExpense(editData.id, transactionData);
+    } else {
+      addExpense(transactionData);
+    }
+
     onClose();
   };
 
@@ -50,34 +69,40 @@ export const AddExpenseModal = ({ isOpen, onClose }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[60]"
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl z-50 overflow-hidden"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-[#020617] border border-white/10 rounded-[32px] shadow-[0_0_50px_rgba(0,0,0,0.5)] z-[70] overflow-hidden"
           >
-            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <h2 className="text-xl font-bold dark:text-white">Añadir Transacción</h2>
+            <div className="p-8 border-b border-white/5 flex items-center justify-between relative">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+              <div>
+                <h2 className="text-xl font-black text-white uppercase tracking-tighter">
+                  {editData ? 'Editar Transacción' : 'Nueva Operación'}
+                </h2>
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Sincronizando con nodo central</p>
+              </div>
               <button 
                 onClick={onClose}
-                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400"
+                className="p-3 bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 rounded-2xl transition-all text-slate-400 hover:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl">
+            <form onSubmit={handleSubmit} className="p-8 space-y-8">
+              <div className="flex bg-white/[0.02] border border-white/5 p-1.5 rounded-2xl">
                 <button
                   type="button"
                   onClick={() => setType('expense')}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl transition-all",
+                    "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest",
                     type === 'expense' 
-                      ? "bg-white dark:bg-slate-700 shadow-sm text-red-500 font-semibold" 
-                      : "text-slate-500 dark:text-slate-400"
+                      ? "bg-rose-500 text-white shadow-[0_0_15px_rgba(244,63,94,0.3)]" 
+                      : "text-slate-500 hover:text-slate-300"
                   )}
                 >
                   <Minus className="w-4 h-4" /> Gasto
@@ -86,82 +111,89 @@ export const AddExpenseModal = ({ isOpen, onClose }) => {
                   type="button"
                   onClick={() => setType('income')}
                   className={cn(
-                    "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl transition-all",
+                    "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl transition-all font-black text-[10px] uppercase tracking-widest",
                     type === 'income' 
-                      ? "bg-white dark:bg-slate-700 shadow-sm text-emerald-500 font-semibold" 
-                      : "text-slate-500 dark:text-slate-400"
+                      ? "bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]" 
+                      : "text-slate-500 hover:text-slate-300"
                   )}
                 >
                   <Plus className="w-4 h-4" /> Ingreso
                 </button>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-500 dark:text-slate-400 ml-1">Monto</label>
-                <div className="relative">
-                  <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <input
-                    type="number"
-                    step="0.01"
-                    required
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="0.00"
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-primary-500 rounded-2xl outline-none text-2xl font-bold transition-all dark:text-white"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-500 dark:text-slate-400 ml-1">Categoría</label>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Monto de Operación</label>
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-indigo-500/20 rounded-2xl blur opacity-0 group-focus-within:opacity-100 transition-opacity" />
                   <div className="relative">
-                    <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <select
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-primary-500 rounded-xl outline-none transition-all dark:text-white appearance-none"
-                    >
-                      {CATEGORIES.map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.icon} {cat.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-500 dark:text-slate-400 ml-1">Fecha</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <DollarSign className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-500" />
                     <input
-                      type="date"
+                      type="number"
+                      step="0.01"
                       required
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-primary-500 rounded-xl outline-none transition-all dark:text-white"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      placeholder="0.00"
+                      className="w-full pl-14 pr-6 py-5 bg-white/[0.03] border border-white/5 focus:border-cyan-500/30 rounded-2xl outline-none text-3xl font-black transition-all text-white placeholder:text-slate-800"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-500 dark:text-slate-400 ml-1">Descripción</label>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Clasificación</label>
+                  <div className="relative">
+                    <Tag className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                    <select
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 bg-white/[0.03] border border-white/5 focus:border-cyan-500/30 rounded-2xl outline-none transition-all text-white text-[11px] font-bold uppercase tracking-widest appearance-none"
+                    >
+                      {CATEGORIES.map(cat => (
+                        <option key={cat.id} value={cat.id} className="bg-[#020617] text-white">{cat.icon} {cat.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Timestamp</label>
+                  <div className="relative">
+                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+                    <input
+                      type="date"
+                      required
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 bg-white/[0.03] border border-white/5 focus:border-cyan-500/30 rounded-2xl outline-none transition-all text-white text-[11px] font-bold uppercase tracking-widest"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Detalle de Operación</label>
                 <div className="relative">
-                  <FileText className="absolute left-4 top-4 w-4 h-4 text-slate-400" />
+                  <FileText className="absolute left-4 top-5 w-4 h-4 text-slate-600" />
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="¿En qué consistió?"
+                    placeholder="Descripción del flujo de datos..."
                     rows="2"
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent focus:border-primary-500 rounded-xl outline-none transition-all dark:text-white resize-none"
+                    className="w-full pl-12 pr-4 py-4 bg-white/[0.03] border border-white/5 focus:border-cyan-500/30 rounded-2xl outline-none transition-all text-white text-[11px] font-bold uppercase tracking-widest resize-none placeholder:text-slate-800"
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-4 bg-primary-500 hover:bg-primary-600 text-white rounded-2xl font-bold text-lg shadow-lg shadow-primary-500/20 transition-all active:scale-[0.98]"
+                className="w-full group relative py-5 bg-white text-black rounded-2xl font-black text-[12px] uppercase tracking-[0.3em] shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all overflow-hidden"
               >
-                Guardar Transacción
+                <div className="absolute inset-0 bg-cyan-500 -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+                <span className="relative z-10 group-hover:text-white transition-colors flex items-center justify-center gap-3">
+                  <Zap className="w-4 h-4" />
+                  {editData ? 'Actualizar Registro' : 'Confirmar Operación'}
+                </span>
               </button>
             </form>
           </motion.div>
