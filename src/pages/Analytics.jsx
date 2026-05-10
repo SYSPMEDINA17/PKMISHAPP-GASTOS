@@ -89,20 +89,20 @@ const Analytics = () => {
     }, []);
 
   return (
-    <div className="pt-4 md:pt-8 pb-12 px-4 md:px-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <header>
+    <div className="pt-4 md:pt-8 pb-12 px-3 md:px-6 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
+        <header className="px-1">
           <div className="flex items-center gap-3 mb-1">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-              <PieChartIcon className="w-6 h-6 text-cyan-500" />
+            <div className="w-10 h-10 shrink-0 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
+              <PieChartIcon className="w-5 h-5 md:w-6 md:h-6 text-cyan-500" />
             </div>
-            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter uppercase">Inteligencia Analítica</h1>
+            <h1 className="text-xl md:text-3xl font-black text-white tracking-tighter uppercase">Inteligencia Analítica</h1>
           </div>
-          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] ml-13">Procesamiento de métricas financieras de alto nivel</p>
+          <p className="text-[8px] md:text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] ml-13">Procesamiento de métricas de alto nivel</p>
         </header>
 
         {/* Resumen de KPI */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {[
             { label: 'Balance Neto', value: totalBalance, color: totalBalance >= 0 ? 'text-cyan-400' : 'text-rose-400', icon: TrendingUp },
             { label: 'Entradas Totales', value: totalIncome, color: 'text-emerald-400', icon: ArrowUpRight },
@@ -113,35 +113,35 @@ const Analytics = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="p-8 bg-white/[0.02] border border-white/5 rounded-[32px] relative overflow-hidden group"
+              className="p-6 md:p-8 bg-white/[0.02] border border-white/5 rounded-[24px] md:rounded-[32px] relative overflow-hidden group"
             >
-              <div className="absolute top-0 right-0 p-6 opacity-5">
-                <kpi.icon className="w-12 h-12 text-white" />
+              <div className="absolute top-0 right-0 p-4 md:p-6 opacity-5">
+                <kpi.icon className="w-8 h-8 md:w-12 md:h-12 text-white" />
               </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-4">{kpi.label}</p>
-              <h3 className={cn("text-3xl font-black tracking-tighter", kpi.color)}>
+              <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-2 md:mb-4">{kpi.label}</p>
+              <h3 className={cn("text-2xl md:text-3xl font-black tracking-tighter", kpi.color)}>
                 {formatCurrency(kpi.value)}
               </h3>
             </motion.div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           {/* Gráfico de Tendencia Mensual */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-slate-950/40 backdrop-blur-xl p-8 rounded-[40px] border border-white/5 shadow-2xl"
+            className="bg-slate-950/40 backdrop-blur-xl p-6 md:p-8 rounded-[32px] md:rounded-[40px] border border-white/5 shadow-2xl"
           >
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-6 md:mb-8">
               <div className="flex items-center gap-3">
                 <Activity className="w-4 h-4 text-cyan-500" />
-                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-white">Flujo Operativo</h3>
+                <h3 className="text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-white">Flujo Operativo</h3>
               </div>
             </div>
-            <div className="h-[300px] w-full">
+            <div className="h-[250px] md:h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
+                <AreaChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#34d399" stopOpacity={0.1}/>
@@ -153,11 +153,11 @@ const Analytics = () => {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff" opacity={0.05} />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#475569', fontSize: 10}} />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#475569', fontSize: 9}} />
                   <YAxis hide />
                   <Tooltip content={<CustomTooltip />} />
-                  <Area type="monotone" dataKey="income" stroke="#34d399" fillOpacity={1} fill="url(#colorIncome)" strokeWidth={3} />
-                  <Area type="monotone" dataKey="expense" stroke="#fb7185" fillOpacity={1} fill="url(#colorExpense)" strokeWidth={3} />
+                  <Area type="monotone" dataKey="income" stroke="#34d399" fillOpacity={1} fill="url(#colorIncome)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="expense" stroke="#fb7185" fillOpacity={1} fill="url(#colorExpense)" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -167,15 +167,15 @@ const Analytics = () => {
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-slate-950/40 backdrop-blur-xl p-8 rounded-[40px] border border-white/5 shadow-2xl"
+            className="bg-slate-950/40 backdrop-blur-xl p-6 md:p-8 rounded-[32px] md:rounded-[40px] border border-white/5 shadow-2xl"
           >
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-6 md:mb-8">
               <div className="flex items-center gap-3">
                 <PieChartIcon className="w-4 h-4 text-indigo-500" />
-                <h3 className="text-xs font-black uppercase tracking-[0.4em] text-white">Distribución de Recursos</h3>
+                <h3 className="text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-white">Distribución de Recursos</h3>
               </div>
             </div>
-            <div className="h-[300px] w-full flex items-center justify-center">
+            <div className="h-[250px] md:h-[300px] w-full flex items-center justify-center">
               {categoryData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -183,8 +183,8 @@ const Analytics = () => {
                       data={categoryData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={60}
-                      outerRadius={100}
+                      innerRadius={window.innerWidth < 768 ? 50 : 60}
+                      outerRadius={window.innerWidth < 768 ? 80 : 100}
                       paddingAngle={5}
                       dataKey="value"
                     >
@@ -197,16 +197,18 @@ const Analytics = () => {
                 </ResponsiveContainer>
               ) : (
                 <div className="text-center">
-                  <p className="text-[10px] uppercase tracking-widest text-slate-700">Sin datos de gastos</p>
+                  <p className="text-[9px] uppercase tracking-widest text-slate-700">Sin datos de gastos</p>
                 </div>
               )}
             </div>
             {/* Legend */}
-            <div className="grid grid-cols-2 gap-2 mt-4">
+            <div className="grid grid-cols-2 gap-2 mt-4 max-h-[100px] overflow-y-auto pr-2 custom-scrollbar">
                {categoryData.map((entry) => (
                  <div key={entry.name} className="flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: CATEGORY_COLORS_MAP[entry.name] }} />
-                   <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">{entry.name}: {formatCurrency(entry.value)}</span>
+                   <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: CATEGORY_COLORS_MAP[entry.name] }} />
+                   <span className="text-[8px] md:text-[9px] font-bold text-slate-500 uppercase tracking-tighter truncate">
+                     {entry.name}: {formatCurrency(entry.value)}
+                   </span>
                  </div>
                ))}
             </div>
@@ -214,12 +216,12 @@ const Analytics = () => {
         </div>
 
         {/* Sección de Resumen Operativo */}
-        <div className="p-8 bg-white/[0.02] border border-white/5 rounded-[40px]">
+        <div className="p-6 md:p-8 bg-white/[0.02] border border-white/5 rounded-[32px] md:rounded-[40px]">
            <div className="flex items-center gap-3 mb-6">
               <BarChart3 className="w-4 h-4 text-cyan-500" />
-              <h3 className="text-xs font-black uppercase tracking-[0.4em] text-white">Eficiencia de Capital</h3>
+              <h3 className="text-[10px] md:text-xs font-black uppercase tracking-[0.4em] text-white">Eficiencia de Capital</h3>
            </div>
-           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {[
                 { label: 'Ratio Ahorro', value: totalIncome > 0 ? `${((totalBalance / totalIncome) * 100).toFixed(1)}%` : '0%' },
                 { label: 'Gasto Diario Prom.', value: formatCurrency(totalExpenses / 30) },
@@ -227,8 +229,8 @@ const Analytics = () => {
                 { label: 'Estado', value: totalBalance >= 0 ? 'Surplus' : 'Déficit' },
               ].map((stat) => (
                 <div key={stat.label}>
-                  <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1">{stat.label}</p>
-                  <p className="text-xl font-black text-white">{stat.stat || stat.value}</p>
+                  <p className="text-[8px] md:text-[9px] font-black text-slate-600 uppercase tracking-widest mb-1">{stat.label}</p>
+                  <p className="text-sm md:text-xl font-black text-white">{stat.stat || stat.value}</p>
                 </div>
               ))}
            </div>

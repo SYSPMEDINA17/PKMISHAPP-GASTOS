@@ -19,10 +19,17 @@ const AppContent = () => {
     return <ResetPassword onComplete={() => setRecoveryMode(false)} />;
   }
 
-  if (loading && !user) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#020617]">
-        <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin shadow-[0_0_15px_rgba(6,182,212,0.3)]"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#020617] gap-6">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-cyan-500/20 rounded-full" />
+          <div className="absolute top-0 left-0 w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(6,182,212,0.4)]" />
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <h2 className="text-white font-black uppercase tracking-[0.3em] text-sm animate-pulse">PKMISHAPP</h2>
+          <p className="text-slate-500 text-[10px] uppercase tracking-widest font-bold">Inicializando entorno seguro...</p>
+        </div>
       </div>
     );
   }

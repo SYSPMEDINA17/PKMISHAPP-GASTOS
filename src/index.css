@@ -33,6 +33,12 @@ html, body, #root {
   min-height: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+/* Safari Backdrop Fix global */
+.backdrop-blur-xl, .backdrop-blur-2xl, .backdrop-blur-3xl {
+  -webkit-backdrop-filter: blur(24px) !important;
 }
 
 /* Optimización Cross-Browser para Glassmorphism */

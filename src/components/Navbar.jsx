@@ -2,12 +2,17 @@ import React from 'react';
 import { Sun, Moon, Bell, Search, User, LogOut, Shield, Menu, X } from 'lucide-react';
 import { useExpenses } from '../context/ExpenseContext';
 import { motion } from 'framer-motion';
+import { cn } from '../lib/utils';
 
 export const Navbar = ({ onProfileClick, toggleSidebar, isSidebarCollapsed }) => {
   const { theme, toggleTheme, signOut, user } = useExpenses();
 
   return (
-    <nav className="fixed top-0 right-0 left-0 bg-[var(--card-bg)] backdrop-blur-2xl border-b border-black/5 dark:border-white/5 h-20 flex items-center justify-between px-4 md:px-8 z-40 transition-all duration-500 ml-0 md:ml-20 shadow-sm dark:shadow-none">
+    <nav className={cn(
+      "fixed top-0 right-0 left-0 bg-[var(--card-bg)] backdrop-blur-2xl border-b border-black/5 dark:border-white/5 h-20 flex items-center justify-between px-4 md:px-8 z-40 transition-all duration-500 shadow-sm dark:shadow-none",
+      isSidebarCollapsed ? "md:ml-20" : "md:ml-72",
+      "ml-0"
+    )}>
 
       {/* Botón Menú Móvil */}
       <button 

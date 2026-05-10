@@ -109,85 +109,152 @@ const Records = () => {
             </div>
           </div>
 
-          {/* Tabla */}
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-white/5">
-                  <th className="px-8 py-6 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Operación</th>
-                  <th className="px-8 py-6 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Tipo</th>
-                  <th className="px-8 py-6 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Categoría</th>
-                  <th className="px-8 py-6 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Timestamp</th>
-                  <th className="px-8 py-6 text-right text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Monto</th>
-                  <th className="px-8 py-6 text-right text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/[0.02]">
-                <AnimatePresence mode="popLayout">
-                  {currentRecords.map((record, index) => (
-                    <motion.tr 
-                      key={record.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ delay: index * 0.03 }}
-                      className="group hover:bg-white/[0.02] transition-colors"
-                    >
-                      <td className="px-8 py-5">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold text-white tracking-tight">{record.description}</span>
-                          <span className="text-[9px] text-slate-600 font-bold uppercase tracking-widest mt-0.5">ID: {record.id.split('-')[0]}</span>
-                        </div>
-                      </td>
-                      <td className="px-8 py-5">
+          {/* Tabla Desktop / Cards Mobile */}
+          <div className="w-full">
+            {/* Vista Desktop */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    <th className="px-8 py-6 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Operación</th>
+                    <th className="px-8 py-6 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Tipo</th>
+                    <th className="px-8 py-6 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Categoría</th>
+                    <th className="px-8 py-6 text-left text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Timestamp</th>
+                    <th className="px-8 py-6 text-right text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Monto</th>
+                    <th className="px-8 py-6 text-right text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/[0.02]">
+                  <AnimatePresence mode="popLayout">
+                    {currentRecords.map((record, index) => (
+                      <motion.tr 
+                        key={record.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ delay: index * 0.03 }}
+                        className="group hover:bg-white/[0.02] transition-colors"
+                      >
+                        <td className="px-8 py-5">
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-white tracking-tight">{record.description}</span>
+                            <span className="text-[9px] text-slate-600 font-bold uppercase tracking-widest mt-0.5">ID: {record.id.split('-')[0]}</span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-5">
+                          <div className={cn(
+                            "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border",
+                            record.type === 'income' 
+                              ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-500" 
+                              : "bg-rose-500/5 border-rose-500/10 text-rose-500"
+                          )}>
+                            {record.type === 'income' ? <ArrowUpCircle className="w-3 h-3" /> : <ArrowDownCircle className="w-3 h-3" />}
+                            <span className="text-[9px] font-black uppercase tracking-widest">
+                              {record.type === 'income' ? 'Inyección' : 'Fuga'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-5 text-[11px] font-bold text-slate-400 uppercase tracking-widest">{record.category}</td>
+                        <td className="px-8 py-5">
+                          <div className="flex items-center gap-2 text-[11px] font-mono text-slate-500">
+                            <Clock className="w-3 h-3 opacity-30" />
+                            {record.date}
+                          </div>
+                        </td>
+                        <td className="px-8 py-5 text-right">
+                          <span className={cn(
+                            "text-base font-black tracking-tighter tabular-nums",
+                            record.type === 'income' ? "text-emerald-400" : "text-white"
+                          )}>
+                            {record.type === 'income' ? '+' : '-'} {formatCurrency(record.amount)}
+                          </span>
+                        </td>
+                        <td className="px-8 py-5 text-right">
+                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button 
+                              onClick={() => handleEdit(record)}
+                              className="p-2.5 bg-white/[0.03] border border-white/5 rounded-xl text-slate-500 hover:text-cyan-400 hover:border-cyan-500/30 transition-all"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button 
+                              onClick={() => deleteExpense(record.id)}
+                              className="p-2.5 bg-white/[0.03] border border-white/5 rounded-xl text-slate-500 hover:text-rose-500 hover:border-rose-500/30 transition-all"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Vista Mobile */}
+            <div className="md:hidden divide-y divide-white/5">
+              <AnimatePresence mode="popLayout">
+                {currentRecords.map((record, index) => (
+                  <motion.div
+                    key={record.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: index * 0.03 }}
+                    className="p-6 flex flex-col gap-4 active:bg-white/[0.02] transition-colors"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-1">
                         <div className={cn(
-                          "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border",
+                          "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-[8px] font-black uppercase tracking-widest mb-1",
                           record.type === 'income' 
                             ? "bg-emerald-500/5 border-emerald-500/10 text-emerald-500" 
                             : "bg-rose-500/5 border-rose-500/10 text-rose-500"
                         )}>
-                          {record.type === 'income' ? <ArrowUpCircle className="w-3 h-3" /> : <ArrowDownCircle className="w-3 h-3" />}
-                          <span className="text-[9px] font-black uppercase tracking-widest">
-                            {record.type === 'income' ? 'Inyección' : 'Fuga'}
+                          {record.type === 'income' ? 'Inyección' : 'Fuga'}
+                        </div>
+                        <h4 className="text-sm font-bold text-white tracking-tight">{record.description}</h4>
+                        <div className="flex items-center gap-2 text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                          <span className="text-cyan-500/50">{record.category}</span>
+                          <span className="w-1 h-1 bg-slate-800 rounded-full" />
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-2.5 h-2.5 opacity-30" />
+                            {record.date}
                           </span>
                         </div>
-                      </td>
-                      <td className="px-8 py-5 text-[11px] font-bold text-slate-400 uppercase tracking-widest">{record.category}</td>
-                      <td className="px-8 py-5">
-                        <div className="flex items-center gap-2 text-[11px] font-mono text-slate-500">
-                          <Clock className="w-3 h-3 opacity-30" />
-                          {record.date}
-                        </div>
-                      </td>
-                      <td className="px-8 py-5 text-right">
-                        <span className={cn(
-                          "text-base font-black tracking-tighter tabular-nums",
+                      </div>
+                      <div className="text-right">
+                        <div className={cn(
+                          "text-lg font-black tracking-tighter tabular-nums",
                           record.type === 'income' ? "text-emerald-400" : "text-white"
                         )}>
                           {record.type === 'income' ? '+' : '-'} {formatCurrency(record.amount)}
-                        </span>
-                      </td>
-                      <td className="px-8 py-5 text-right">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button 
-                            onClick={() => handleEdit(record)}
-                            className="p-2.5 bg-white/[0.03] border border-white/5 rounded-xl text-slate-500 hover:text-cyan-400 hover:border-cyan-500/30 transition-all"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                          <button 
-                            onClick={() => deleteExpense(record.id)}
-                            className="p-2.5 bg-white/[0.03] border border-white/5 rounded-xl text-slate-500 hover:text-rose-500 hover:border-rose-500/30 transition-all"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
                         </div>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
-              </tbody>
-            </table>
+                        <p className="text-[8px] text-slate-700 font-bold uppercase tracking-tighter mt-1">ID: {record.id.split('-')[0]}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 pt-2">
+                      <button 
+                        onClick={() => handleEdit(record)}
+                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/[0.03] border border-white/5 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 active:text-cyan-400 active:bg-cyan-500/5 active:border-cyan-500/20 transition-all"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        Editar
+                      </button>
+                      <button 
+                        onClick={() => deleteExpense(record.id)}
+                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/[0.03] border border-white/5 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-400 active:text-rose-500 active:bg-rose-500/5 active:border-rose-500/20 transition-all"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Eliminar
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
 
             {currentRecords.length === 0 && (
               <div className="py-24 flex flex-col items-center justify-center">

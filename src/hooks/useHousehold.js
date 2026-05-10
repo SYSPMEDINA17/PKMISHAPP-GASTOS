@@ -1,25 +1,35 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 
 export const useHousehold = (user) => {
   const [householdId, setHouseholdId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const initializationInProgress = useRef(false);
 
   useEffect(() => {
-    // Si no hay usuario o ya tenemos un householdId, no hacemos nada
-    if (!user?.id || householdId) {
-      if (!user?.id) setLoading(false);
+    if (!user?.id) {
+      setHouseholdId(null);
+      setLoading(false);
       return;
     }
 
+    if (householdId) {
+      setLoading(false);
+      return;
+    }
+
+    if (initializationInProgress.current) return;
+
     const getOrCreateHousehold = async () => {
       try {
+        initializationInProgress.current = true;
         setLoading(true);
         setError(null);
 
-        // 1. CONSULTA: Buscar si el usuario ya pertenece a un hogar
-        // Usamos una consulta simple sin .single() para manejar mejor el flujo
+        console.log(`[Household] Verificando membresía para: ${user.email}`);
+
+        // 1. BUSCAR MEMBRESÍA EXISTENTE
         const { data: members, error: memberError } = await supabase
           .from('household_members')
           .select('household_id')
@@ -27,55 +37,67 @@ export const useHousehold = (user) => {
 
         if (memberError) throw memberError;
 
-        // 2. VERIFICACIÓN: Si hay resultados, usamos el existente
         if (members && members.length > 0) {
           const existingId = members[0].household_id;
-          console.log('✅ Household encontrado para el usuario:', existingId);
+          console.log('✅ [Household] Membresía encontrada:', existingId);
           setHouseholdId(existingId);
-          return; // Salimos de la función, ya tenemos lo que necesitamos
+          return;
         }
 
-        // 3. CREACIÓN: Solo llegamos aquí si members.length === 0
-        console.log('🏠 No se encontró household. Creando uno nuevo...');
+        // 2. CREACIÓN DINÁMICA (Estrategia de Bypass RLS)
+        // Generamos el ID en el cliente para no depender de .select() que suele fallar por RLS
+        // si el usuario aún no es miembro.
+        const newHouseholdId = crypto.randomUUID();
+        console.log('[Household] Creando nuevo hogar con ID pre-generado:', newHouseholdId);
         
-        const { data: newHousehold, error: createError } = await supabase
+        // Insertar el hogar sin pedir respuesta (select) para evitar error de política de lectura
+        const { error: createError } = await supabase
           .from('households')
-          .insert([{ name: `Hogar de ${user.email.split('@')[0]}` }])
-          .select()
-          .maybeSingle();
+          .insert([{ 
+            id: newHouseholdId, 
+            name: `Hogar de ${user.email.split('@')[0]}` 
+          }]);
 
-        if (createError) throw createError;
-        if (!newHousehold) throw new Error('Error crítico: El hogar no pudo ser creado.');
+        if (createError) {
+          console.error('[Household] Error al insertar en households:', createError.message);
+          // Si el error es de RLS aquí, es que la política de INSERT está bloqueada.
+          throw createError;
+        }
 
-        console.log('✨ Nuevo household creado:', newHousehold.id);
-
-        // 4. VINCULACIÓN: Unir al usuario con el nuevo hogar
+        // 3. VINCULACIÓN INMEDIATA
+        console.log('[Household] Vinculando usuario al nuevo ID...');
         const { error: linkError } = await supabase
           .from('household_members')
           .insert([{ 
             user_id: user.id, 
-            household_id: newHousehold.id
+            household_id: newHouseholdId
           }]);
 
         if (linkError) {
-          // Si falla la vinculación pero el household se creó, 
-          // el siguiente intento del hook encontrará el household o fallará limpiamente.
+          console.error('[Household] Error al vincular miembro:', linkError.message);
           throw linkError;
         }
 
-        setHouseholdId(newHousehold.id);
-        console.log('🔗 Usuario vinculado al nuevo household correctamente.');
+        setHouseholdId(newHouseholdId);
+        console.log(`🚀 [Household] Configuración completada. ID: ${newHouseholdId}`);
 
       } catch (err) {
-        console.error('❌ Error en la lógica de Household:', err.message);
-        setError(err.message);
+        console.error('❌ [Household] Error crítico:', err.message);
+        
+        // Manejo amigable de error RLS
+        if (err.message.includes('row-level security policy')) {
+          setError('Permisos de base de datos insuficientes para crear un hogar. Contacta al administrador.');
+        } else {
+          setError(err.message);
+        }
       } finally {
         setLoading(false);
+        initializationInProgress.current = false;
       }
     };
 
     getOrCreateHousehold();
-  }, [user?.id, householdId]); // Dependencias precisas
+  }, [user?.id, householdId]);
 
   return { householdId, loading, error };
 };

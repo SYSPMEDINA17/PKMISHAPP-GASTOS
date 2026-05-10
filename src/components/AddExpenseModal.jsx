@@ -6,12 +6,14 @@ import { cn } from '../lib/utils';
 import { CATEGORIES } from '../lib/constants.jsx';
 
 export const AddExpenseModal = ({ isOpen, onClose, editData = null }) => {
-  const { addExpense, updateExpense } = useExpenses();
+  const { addExpense, updateExpense, householdId } = useExpenses();
   const [type, setType] = useState('expense');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState(CATEGORIES[0].id);
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+
+  const isInitializing = !householdId;
 
   useEffect(() => {
     if (editData) {
@@ -31,7 +33,7 @@ export const AddExpenseModal = ({ isOpen, onClose, editData = null }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!amount || isNaN(amount)) return;
+    if (!amount || isNaN(amount) || isInitializing) return;
 
     const transactionData = {
       type,
@@ -73,7 +75,9 @@ export const AddExpenseModal = ({ isOpen, onClose, editData = null }) => {
                 <h2 className="text-xl font-black text-white uppercase tracking-tighter">
                   {editData ? 'Editar Transacción' : 'Nueva Operación'}
                 </h2>
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Sincronizando con nodo central</p>
+                <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">
+                  {isInitializing ? 'Sincronizando nodo central...' : 'Conexión segura establecida'}
+                </p>
               </div>
               <button 
                 onClick={onClose}
@@ -177,12 +181,18 @@ export const AddExpenseModal = ({ isOpen, onClose, editData = null }) => {
 
               <button
                 type="submit"
-                className="w-full group relative py-5 bg-white text-black rounded-2xl font-black text-[12px] uppercase tracking-[0.3em] shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all overflow-hidden"
+                disabled={isInitializing}
+                className={cn(
+                  "w-full group relative py-5 rounded-2xl font-black text-[12px] uppercase tracking-[0.3em] shadow-xl transition-all overflow-hidden",
+                  isInitializing 
+                    ? "bg-slate-800 text-slate-500 cursor-not-allowed opacity-50" 
+                    : "bg-white text-black hover:scale-[1.02] active:scale-[0.98]"
+                )}
               >
-                <div className="absolute inset-0 bg-cyan-500 -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+                {!isInitializing && <div className="absolute inset-0 bg-cyan-500 -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />}
                 <span className="relative z-10 group-hover:text-white transition-colors flex items-center justify-center gap-3">
-                  <Zap className="w-4 h-4" />
-                  {editData ? 'Actualizar Registro' : 'Confirmar Operación'}
+                  <Zap className={cn("w-4 h-4", isInitializing ? "animate-pulse" : "")} />
+                  {isInitializing ? 'Inicializando hogar...' : (editData ? 'Actualizar Registro' : 'Confirmar Operación')}
                 </span>
               </button>
             </form>

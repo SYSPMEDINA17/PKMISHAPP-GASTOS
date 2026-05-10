@@ -18,19 +18,19 @@ export const TransactionList = () => {
     <motion.div 
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-slate-950/40 backdrop-blur-xl p-8 rounded-[32px] border border-white/5 shadow-2xl overflow-hidden relative"
+      className="bg-slate-950/40 backdrop-blur-xl p-5 md:p-8 rounded-[24px] md:rounded-[32px] border border-white/5 shadow-2xl overflow-hidden relative"
     >
       {/* Indicador visual de base de datos */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-[2px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-10 relative z-10">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-8 md:mb-10 relative z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
+          <div className="w-10 h-10 shrink-0 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
             <Database className="w-4 h-4 text-cyan-500" />
           </div>
           <div>
-            <h3 className="text-sm font-black uppercase tracking-[0.3em] text-white">Log de Operaciones</h3>
-            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Stream de datos en tiempo real</p>
+            <h3 className="text-[10px] md:text-sm font-black uppercase tracking-[0.3em] text-white">Log de Operaciones</h3>
+            <p className="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">Stream de datos en tiempo real</p>
           </div>
         </div>
         
@@ -39,7 +39,7 @@ export const TransactionList = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-600 group-focus-within:text-cyan-400 transition-colors" />
             <input 
               type="text" 
-              placeholder="Escanear registros..." 
+              placeholder="Buscar..." 
               className="w-full sm:w-56 pl-10 pr-4 py-3 bg-white/[0.03] border border-white/5 rounded-2xl text-[10px] font-bold uppercase tracking-widest outline-none focus:border-cyan-500/30 focus:bg-white/[0.06] transition-all text-white placeholder:text-slate-700"
             />
           </div>
@@ -49,7 +49,7 @@ export const TransactionList = () => {
         </div>
       </div>
 
-      <div className="space-y-4 max-h-[500px] overflow-y-auto pr-3 custom-scrollbar">
+      <div className="space-y-3 md:space-y-4 max-h-[500px] overflow-y-auto pr-1 md:pr-3 custom-scrollbar">
         <AnimatePresence mode='popLayout'>
           {filteredExpenses.length === 0 ? (
             <motion.div 
@@ -60,7 +60,7 @@ export const TransactionList = () => {
               <div className="w-16 h-16 bg-white/[0.03] rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
                 <Search className="w-6 h-6 text-slate-800" />
               </div>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-600 font-black">Base de datos sin registros</p>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-600 font-black">Sin registros</p>
             </motion.div>
           ) : (
             filteredExpenses.map((expense, index) => {
@@ -72,42 +72,39 @@ export const TransactionList = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.03 }}
-                  className="group relative flex items-center justify-between p-4 bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-white/10 rounded-2xl transition-all duration-300"
+                  className="group relative flex items-center justify-between p-3 md:p-4 bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-white/10 rounded-2xl transition-all duration-300"
                 >
-                  <div className="flex items-center gap-5 relative z-10">
+                  <div className="flex items-center gap-3 md:gap-5 relative z-10 flex-1 min-w-0">
                     <div className={cn(
-                      "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 border text-xl",
+                      "w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-xl md:rounded-2xl flex items-center justify-center transition-all duration-300 border text-lg md:text-xl",
                       categoryInfo.bgColor,
                       categoryInfo.borderColor
                     )}>
                       {categoryInfo.emoji}
                     </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-white leading-tight mb-1 tracking-tight">
+                    <div className="min-w-0 truncate">
+                      <h4 className="text-[11px] md:text-sm font-bold text-white leading-tight mb-1 tracking-tight truncate">
                         {expense.description}
                       </h4>
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                          <Clock className="w-3 h-3 opacity-30" />
+                      <div className="flex items-center gap-2 md:gap-3">
+                        <div className="flex items-center gap-1 text-[8px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest shrink-0">
+                          <Clock className="w-2.5 h-2.5 md:w-3 md:h-3 opacity-30" />
                           {new Date(expense.date).toLocaleDateString('es-ES', { 
                             day: '2-digit',
                             month: 'short'
                           })}
                         </div>
-                        <span className="w-1 h-1 bg-slate-800 rounded-full" />
-                        <span className={cn("text-[10px] font-black uppercase tracking-widest", categoryInfo.color)}>
+                        <span className="w-1 h-1 bg-slate-800 rounded-full shrink-0" />
+                        <span className={cn("text-[8px] md:text-[10px] font-black uppercase tracking-widest truncate", categoryInfo.color)}>
                           {categoryInfo.label}
                         </span>
                       </div>
-                      <p className="text-[9px] font-bold text-slate-700 mt-1 uppercase tracking-tighter">
-                        Origin: <span className="text-slate-500">{expense.user_id === user?.id ? 'Local Node' : `Member ${expense.user_id.split('-')[0]}`}</span>
-                      </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-6 relative z-10">
+                  <div className="flex items-center gap-3 md:gap-6 relative z-10 ml-2">
                     <span className={cn(
-                      "font-mono font-black text-base tracking-tighter tabular-nums transition-all group-hover:scale-110",
+                      "font-mono font-black text-sm md:text-base tracking-tighter tabular-nums transition-all group-hover:scale-110",
                       expense.type === 'income' 
                         ? "text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]" 
                         : "text-white"
@@ -118,9 +115,9 @@ export const TransactionList = () => {
                     
                     <button 
                       onClick={() => deleteExpense(expense.id)}
-                      className="p-2.5 text-slate-800 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0"
+                      className="p-2 md:p-2.5 text-slate-800 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all opacity-0 md:opacity-0 group-hover:opacity-100 group-active:opacity-100 translate-x-2 group-hover:translate-x-0"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                     </button>
                   </div>
 
@@ -133,9 +130,9 @@ export const TransactionList = () => {
         </AnimatePresence>
       </div>
 
-      <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center text-[8px] font-black text-slate-700 uppercase tracking-[0.4em]">
-        <span>Sincronización de Nodos: OK</span>
-        <span className="text-cyan-500/20">Data Stream Active</span>
+      <div className="mt-6 md:mt-8 pt-6 border-t border-white/5 flex justify-between items-center text-[7px] md:text-[8px] font-black text-slate-700 uppercase tracking-[0.4em]">
+        <span>Sync: OK</span>
+        <span className="text-cyan-500/20">Data Active</span>
       </div>
     </motion.div>
   );

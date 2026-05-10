@@ -15,7 +15,7 @@ export const ExpenseProvider = ({ children }) => {
     recoveryMode, 
     setRecoveryMode 
   } = useSupabaseAuth();
-  const { householdId, loading: householdLoading } = useHousehold(user);
+  const { householdId, loading: householdLoading, error: householdError } = useHousehold(user);
   
   const [expenses, setExpenses] = useState([]);
   const [members, setMembers] = useState([]);
@@ -31,11 +31,8 @@ export const ExpenseProvider = ({ children }) => {
   const isGlobalLoading = authLoading || (user && householdLoading);
 
   useEffect(() => {
-    document.documentElement.classList.add('dark');
-  }, []);
-
-  useEffect(() => {
     if (user && householdId) {
+      console.log('[Context] Usuario y Hogar listos. Cargando datos...');
       fetchTransactions();
       fetchMembers();
       fetchGoals();
@@ -47,6 +44,14 @@ export const ExpenseProvider = ({ children }) => {
       setLoading(false);
     }
   }, [user, householdId, authLoading]);
+
+  useEffect(() => {
+    if (householdError) {
+      toast.error('Error de sistema: ' + householdError, {
+        description: 'Por favor, recarga la página o contacta a soporte.'
+      });
+    }
+  }, [householdError]);
 
   useEffect(() => {
     if (!user || !householdId || !supabase) return;
